@@ -1,2 +1,8 @@
 /node_modules
 /vendor
+/database
+/tests
+/storage/app/tmp-compress
+/compress-images.mjs
+/cleanup-after-compress.mjs
+/public/images/gallery-backup
