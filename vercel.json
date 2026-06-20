@@ -9,6 +9,6 @@
     { "src": "/favicon.ico", "dest": "/favicon.ico" },
     { "src": "/(.*)", "dest": "/api/index.php" }
   ],
-  "buildCommand": "npm ci && npm run build",
+  "buildCommand": "VERCEL_ANALYZE_BUILD_OUTPUT=1 npm ci && npm run build",
   "outputDirectory": "public"
 }
