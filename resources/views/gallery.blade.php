@@ -26,12 +26,14 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
              x-data="{
                 activeFilter: 'all',
-                selectedIndex: null,
-                totalItems: {{ count($gallery) }},
+                selected: null,
+                imgIndex: 0,
+                items: @json($gallery),
              }"
-             @keydown.escape.window="selectedIndex = null"
-             @keydown.arrow-left.window="if (selectedIndex !== null && selectedIndex > 0) selectedIndex--"
-             @keydown.arrow-right.window="if (selectedIndex !== null && selectedIndex < totalItems - 1) selectedIndex++">
+             x-init="$watch('selected', val => { if (val !== null) imgIndex = 0 })"
+             @keydown.escape.window="selected = null"
+             @keydown.arrow-left.window="if (selected !== null && imgIndex > 0) imgIndex--"
+             @keydown.arrow-right.window="if (selected !== null && imgIndex < selected.images.length - 1) imgIndex++">
 
             {{-- Filter Chips --}}
             <div class="flex flex-wrap gap-3 mb-12 justify-center">
@@ -49,14 +51,14 @@
                 @endforeach
             </div>
 
-            {{-- Grid 2/3/4 kolom --}}
+            {{-- Grid --}}
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                @foreach($gallery as $item)
+                @foreach($gallery as $idx => $item)
                     <div x-show="activeFilter === 'all' || activeFilter === '{{ $item['category'] }}'"
                          x-transition:enter="transition ease-out duration-300"
                          x-transition:enter-start="opacity-0 scale-95"
                          x-transition:enter-end="opacity-100 scale-100"
-                         @click="selectedIndex = {{ $loop->index }}"
+                         @click="selected = items[{{ $idx }}]; imgIndex = 0"
                          class="cursor-pointer overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300 group hover:-translate-y-1">
                         <div class="relative">
                             <img src="{{ $item['image'] }}"
@@ -75,12 +77,12 @@
 
             {{-- Lightbox Modal --}}
             <template x-teleport="body">
-                <div x-show="selectedIndex !== null"
+                <div x-show="selected !== null"
                      x-cloak
                      class="fixed inset-0 z-50 flex items-center justify-center p-4">
 
                     {{-- Overlay --}}
-                    <div x-show="selectedIndex !== null"
+                    <div x-show="selected !== null"
                          x-transition:enter="transition ease-out duration-200"
                          x-transition:enter-start="opacity-0"
                          x-transition:enter-end="opacity-100"
@@ -88,29 +90,27 @@
                          x-transition:leave-start="opacity-100"
                          x-transition:leave-end="opacity-0"
                          class="absolute inset-0 bg-black/90 backdrop-blur-sm"
-                         @click="selectedIndex = null">
+                         @click="selected = null">
                     </div>
 
                     {{-- Content --}}
-                    <div x-show="selectedIndex !== null"
+                    <div x-show="selected !== null"
                          x-transition:enter="transition ease-out duration-300"
                          x-transition:enter-start="opacity-0 scale-95 translate-y-4"
                          x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                          x-transition:leave="transition ease-in duration-150"
                          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                          x-transition:leave-end="opacity-0 scale-95 translate-y-4"
-                         class="relative z-10 w-full max-w-4xl bg-white rounded-2xl overflow-hidden shadow-2xl"
-                         @keydown.arrow-left.window="$event.stopPropagation()"
-                         @keydown.arrow-right.window="$event.stopPropagation()">
+                         class="relative z-10 w-full max-w-4xl bg-white rounded-2xl overflow-hidden shadow-2xl">
 
                         {{-- Progress bar at top --}}
                         <div class="absolute top-0 left-0 right-0 z-30 h-1 bg-black/10">
                             <div class="h-full bg-brand-amber transition-all duration-400"
-                                 :style="`width: ${((selectedIndex + 1) / totalItems) * 100}%`"></div>
+                                 :style="`width: ${((imgIndex + 1) / (selected?.images?.length || 1)) * 100}%`"></div>
                         </div>
 
                         {{-- Close button --}}
-                        <button @click="selectedIndex = null"
+                        <button @click="selected = null"
                                 class="absolute top-4 right-4 z-30 w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center hover:bg-black/70 hover:scale-110 transition-all duration-200 cursor-pointer shadow-lg">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -119,28 +119,42 @@
 
                         {{-- Image area --}}
                         <div class="relative bg-black">
-                            @foreach($gallery as $item)
-                                <div x-show="selectedIndex === {{ $loop->index }}"
-                                     x-transition:enter="transition ease-out duration-300"
-                                     x-transition:enter-start="opacity-0"
-                                     x-transition:enter-end="opacity-100"
-                                     x-transition:leave="transition ease-in duration-200"
-                                     x-transition:leave-start="opacity-100"
-                                     x-transition:leave-end="opacity-0">
-                                    <img src="{{ $item['image'] }}"
-                                         alt="{{ $item['title'] }}"
-                                         class="w-full max-h-[65vh] object-contain"
-                                         loading="lazy">
+                            <template x-if="selected">
+                                <div>
+                                    <template x-for="(img, i) in selected.images" :key="i">
+                                        <img :src="img"
+                                             :alt="selected.title"
+                                             x-show="imgIndex === i"
+                                             x-transition:enter="transition ease-out duration-300"
+                                             x-transition:enter-start="opacity-0"
+                                             x-transition:enter-end="opacity-100"
+                                             x-transition:leave="transition ease-in duration-200"
+                                             x-transition:leave-start="opacity-100"
+                                             x-transition:leave-end="opacity-0"
+                                             class="w-full max-h-[65vh] object-contain"
+                                             loading="lazy">
+                                    </template>
                                 </div>
-                            @endforeach
+                            </template>
+
+                            {{-- Dash indicators --}}
+                            <div x-show="selected && selected.images.length > 1"
+                                 class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-2 rounded-full bg-black/50 backdrop-blur-sm">
+                                <template x-for="(_, i) in selected?.images || []" :key="i">
+                                    <button @click="imgIndex = i"
+                                            class="h-1.5 rounded-full transition-all duration-300 cursor-pointer"
+                                            :class="i === imgIndex ? 'w-6 bg-brand-amber' : 'w-1.5 bg-white/50 hover:bg-white/80'"></button>
+                                </template>
+                            </div>
 
                             {{-- Counter pill --}}
-                            <div class="absolute top-4 left-4 z-20 px-3 py-1 rounded-full bg-black/50 backdrop-blur-sm text-white text-xs font-medium"
-                                 x-text="`${selectedIndex + 1} / ${totalItems}`"></div>
+                            <div x-show="selected && selected.images.length > 1"
+                                 class="absolute top-4 left-4 z-20 px-3 py-1 rounded-full bg-black/50 backdrop-blur-sm text-white text-xs font-medium"
+                                 x-text="`${imgIndex + 1} / ${selected.images.length}`"></div>
 
                             {{-- Prev button --}}
-                            <button @click="if (selectedIndex > 0) selectedIndex--"
-                                    x-show="selectedIndex > 0"
+                            <button @click="if (imgIndex > 0) imgIndex--"
+                                    x-show="imgIndex > 0"
                                     class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/15 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/30 hover:scale-110 transition-all duration-200 cursor-pointer shadow-lg border border-white/10">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
@@ -148,8 +162,8 @@
                             </button>
 
                             {{-- Next button --}}
-                            <button @click="if (selectedIndex < totalItems - 1) selectedIndex++"
-                                    x-show="selectedIndex < totalItems - 1"
+                            <button @click="if (imgIndex < selected.images.length - 1) imgIndex++"
+                                    x-show="imgIndex < selected.images.length - 1"
                                     class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/15 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/30 hover:scale-110 transition-all duration-200 cursor-pointer shadow-lg border border-white/10">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
@@ -158,19 +172,13 @@
                         </div>
 
                         {{-- Info footer --}}
-                        @foreach($gallery as $item)
-                            <div x-show="selectedIndex === {{ $loop->index }}"
-                                 x-transition:enter="transition ease-out duration-200"
-                                 x-transition:enter-start="opacity-0"
-                                 x-transition:enter-end="opacity-100"
-                                 class="p-5 sm:p-6">
+                        <template x-if="selected">
+                            <div class="p-5 sm:p-6">
                                 <div class="flex items-center justify-between mb-1">
-                                    <h3 class="font-semibold text-lg text-brand-black">{{ $item['title'] }}</h3>
-                                    <span class="inline-block px-3 py-1 bg-brand-amber/15 text-brand-amber text-xs font-semibold rounded-full">
-                                        {{ $item['category'] }}
-                                    </span>
+                                    <h3 class="font-semibold text-lg text-brand-black" x-text="selected.title"></h3>
+                                    <span class="inline-block px-3 py-1 bg-brand-amber/15 text-brand-amber text-xs font-semibold rounded-full" x-text="selected.category"></span>
                                 </div>
-                                <p class="text-sm text-gray-500">{{ $item['description'] }}</p>
+                                <p class="text-sm text-gray-500" x-text="selected.description"></p>
                                 <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
                                     <div class="flex items-center gap-2 text-xs text-gray-400">
                                         <span class="flex items-center gap-1"><kbd class="px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 font-mono text-[10px]">ESC</kbd> Tutup</span>
@@ -178,7 +186,7 @@
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
+                        </template>
                     </div>
                 </div>
             </template>
