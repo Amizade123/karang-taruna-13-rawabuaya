@@ -54,7 +54,7 @@
             <div class="lg:flex lg:items-center lg:space-x-16" x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 200)">
                 <div class="lg:w-1/2 mb-10 lg:mb-0">
                     <img src="/images/logo/logo.png" alt="Karang Taruna 13 Rawa Buaya"
-                         class="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 rounded-full object-cover shadow-2xl shadow-brand-amber/30 mb-6 md:mb-8"
+                         class="w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48 rounded-full object-cover shadow-2xl shadow-brand-amber/30 mb-6 md:mb-8 mx-auto lg:mx-0"
                          :class="loaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'"
                          style="transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);">
                     <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 md:mb-8"
