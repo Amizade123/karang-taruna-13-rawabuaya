@@ -17,9 +17,10 @@ $app = Application::configure(basePath: dirname(__DIR__))
         //
     })->create();
 
-$storagePath = getenv('VERCEL') || getenv('NOW_REGION')
-    ? '/tmp/storage'
-    : realpath(__DIR__ . '/../storage');
+$storagePath = realpath(__DIR__ . '/../storage');
+if (is_writable('/tmp')) {
+    $storagePath = '/tmp/storage';
+}
 
 $app->useStoragePath($storagePath);
 

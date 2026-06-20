@@ -8,10 +8,14 @@ if (getenv('VERCEL') || getenv('NOW_REGION')) {
     putenv('CACHE_STORE=array');
 
     $dirs = [
+        '/tmp/storage/app',
+        '/tmp/storage/app/private',
+        '/tmp/storage/app/public',
         '/tmp/storage/framework/views',
         '/tmp/storage/framework/cache',
         '/tmp/storage/framework/cache/data',
         '/tmp/storage/framework/sessions',
+        '/tmp/storage/framework/testing',
         '/tmp/storage/logs',
     ];
     foreach ($dirs as $dir) {
@@ -21,12 +25,8 @@ if (getenv('VERCEL') || getenv('NOW_REGION')) {
     }
 
     putenv('VIEW_COMPILED_PATH=/tmp/storage/framework/views');
-
-    // Force APP_KEY if not available from env
-    $key = getenv('APP_KEY');
-    if (!$key) {
-        putenv('APP_KEY=base64:6wUneeeyxhXw6nNgr5g4qOauPrJZYnZ0h31r9TlrO1I=');
-    }
 }
+
+error_reporting(0);
 
 require __DIR__ . '/../public/index.php';
