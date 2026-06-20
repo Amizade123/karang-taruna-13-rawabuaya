@@ -24,7 +24,7 @@
     {{-- Filter & Grid --}}
     <section class="py-20 sm:py-24 bg-gray-50 reveal-on-scroll">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-             x-data="{ activeFilter: 'all', selected: null, imgIndex: 0 }"
+             x-data="{ activeFilter: 'all', selected: null, imgIndex: 0, activities: @json($activities) }"
              x-init="$watch('selected', val => { if (val !== null) imgIndex = 0 })"
              @keydown.escape.window="selected = null"
              @keydown.arrow-left.window="if (selected !== null && imgIndex > 0) imgIndex--"
@@ -48,12 +48,12 @@
 
             {{-- Grid --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach($activities as $activity)
+                @foreach($activities as $idx => $activity)
                     <div x-show="activeFilter === 'all' || activeFilter === '{{ $activity['category'] }}'"
                          x-transition:enter="transition ease-out duration-300"
                          x-transition:enter-start="opacity-0 scale-95"
                          x-transition:enter-end="opacity-100 scale-100"
-                         @click='selected = @json($activity); imgIndex = 0'
+                         @click="selected = activities[{{ $idx }}]; imgIndex = 0"
                          class="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1">
                         <div class="relative overflow-hidden">
                             <img src="{{ $activity['image'] }}"
