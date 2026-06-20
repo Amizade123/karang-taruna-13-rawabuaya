@@ -4,7 +4,10 @@
             {{-- Logo + Nama --}}
             <a href="{{ route('home') }}" class="flex items-center space-x-3">
                 <img src="/images/logo/logo.png" alt="Karang Taruna 13 Rawa Buaya" class="w-10 h-10 rounded-full object-cover">
-                <span class="font-semibold text-lg hidden sm:block">Karang Taruna 13 Rawa Buaya</span>
+                <span class="hidden sm:flex flex-col leading-tight">
+                    <span class="font-semibold text-base lg:text-lg">Karang Taruna 13</span>
+                    <span class="text-[10px] lg:text-xs text-brand-amber font-medium tracking-widest uppercase -mt-0.5">RT 13 Rawa Buaya</span>
+                </span>
                 <span class="sm:hidden flex flex-col leading-tight">
                     <span class="font-semibold text-base">Karang</span>
                     <span class="font-semibold text-sm -mt-0.5">Taruna 13</span>
