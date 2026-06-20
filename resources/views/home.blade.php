@@ -121,9 +121,11 @@
         </div>
     </section>
 
+<script>window.__activities = @json($activities);</script>
+
     {{-- Highlight Kegiatan Terbaru --}}
     <section class="py-14 md:py-20 lg:py-24 bg-gray-50 reveal-on-scroll"
-             x-data="{ selected: null, imgIndex: 0, activities: @json($activities) }"
+             x-data="{ selected: null, imgIndex: 0, activities: window.__activities || [] }"
              x-init="$watch('selected', val => { if (val !== null) imgIndex = 0 })"
              @keydown.escape.window="selected = null"
              @keydown.arrow-left.window="if (selected !== null && imgIndex > 0) imgIndex--"
@@ -311,9 +313,11 @@
         </div>
     </section>
 
+    <script>window.__galleryPreview = @json($gallery);</script>
+
     {{-- Preview Galeri --}}
     <section class="py-20 sm:py-24 bg-gray-50 reveal-on-scroll"
-             x-data="{ selected: null, imgIndex: 0, galleries: @json($gallery) }"
+             x-data="{ selected: null, imgIndex: 0, galleries: window.__galleryPreview || [] }"
              x-init="$watch('selected', val => { if (val !== null) imgIndex = 0 })"
              @keydown.escape.window="selected = null"
              @keydown.arrow-left.window="if (selected !== null && imgIndex > 0) imgIndex--"

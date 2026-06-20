@@ -21,10 +21,12 @@
         </div>
     </section>
 
+<script>window.__activities = @json($activities);</script>
+
     {{-- Filter & Grid --}}
     <section class="py-20 sm:py-24 bg-gray-50 reveal-on-scroll">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-             x-data="{ activeFilter: 'all', selected: null, imgIndex: 0, activities: @json($activities) }"
+             x-data="{ activeFilter: 'all', selected: null, imgIndex: 0, activities: window.__activities || [] }"
              x-init="$watch('selected', val => { if (val !== null) imgIndex = 0 })"
              @keydown.escape.window="selected = null"
              @keydown.arrow-left.window="if (selected !== null && imgIndex > 0) imgIndex--"

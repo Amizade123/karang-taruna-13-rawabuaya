@@ -21,6 +21,8 @@
         </div>
     </section>
 
+    <script>window.__gallery = @json($gallery);</script>
+
     {{-- Grid + Lightbox --}}
     <section class="py-20 sm:py-24 bg-gray-50 reveal-on-scroll">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
@@ -28,7 +30,7 @@
                 activeFilter: 'all',
                 selected: null,
                 imgIndex: 0,
-                items: @json($gallery),
+                items: window.__gallery || [],
              }"
              x-init="$watch('selected', val => { if (val !== null) imgIndex = 0 })"
              @keydown.escape.window="selected = null"
