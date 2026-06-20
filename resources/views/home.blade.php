@@ -123,7 +123,7 @@
 
     {{-- Highlight Kegiatan Terbaru --}}
     <section class="py-14 md:py-20 lg:py-24 bg-gray-50 reveal-on-scroll"
-             x-data="{ selected: null, imgIndex: 0 }"
+             x-data="{ selected: null, imgIndex: 0, activities: @json($activities) }"
              x-init="$watch('selected', val => { if (val !== null) imgIndex = 0 })"
              @keydown.escape.window="selected = null"
              @keydown.arrow-left.window="if (selected !== null && imgIndex > 0) imgIndex--"
@@ -140,8 +140,8 @@
                 </a>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-                @foreach($activities as $activity)
-                    <div @click='selected = @json($activity); imgIndex = 0'
+                @foreach($activities as $idx => $activity)
+                    <div @click="selected = activities[{{ $idx }}]; imgIndex = 0"
                          class="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1">
                         <div class="relative overflow-hidden aspect-[4/3]">
                             <img src="{{ $activity['image'] }}" alt="{{ $activity['title'] }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy">
@@ -396,79 +396,7 @@
         </div>
     </section>
 
-    {{-- Testimoni / Social Proof --}}
-    <section class="py-20 sm:py-24 bg-white reveal-on-scroll">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <span class="inline-block px-4 py-1.5 bg-brand-amber/10 text-brand-amber text-sm font-semibold rounded-full mb-4">Apa Kata Mereka</span>
-                <h2 class="text-3xl sm:text-4xl font-bold text-brand-black mb-4">Testimoni</h2>
-                <div class="w-16 h-1 bg-brand-amber mx-auto rounded-full"></div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {{-- TODO: ganti dengan testimoni asli --}}
-                <div class="group relative p-6 md:p-8 bg-white rounded-2xl border border-gray-100 hover:border-brand-amber/30 hover:shadow-xl transition-all duration-300 cursor-pointer">
-                    <div class="absolute -top-3 -left-3 w-10 h-10 bg-brand-amber/10 rounded-full flex items-center justify-center">
-                        <svg class="w-5 h-5 text-brand-amber" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151C7.563 6.068 6 8.789 6 11h4v10H0z"/></svg>
-                    </div>
-                    <div class="flex items-center gap-1 text-brand-amber mb-4">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    </div>
-                    <p class="text-gray-600 text-sm leading-relaxed mb-6">"Karang Taruna 13 benar-benar menjadi wadah positif bagi pemuda di lingkungan kami. Banyak kegiatan bermanfaat yang melibatkan warga."</p>
-                    <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
-                        <div class="w-11 h-11 rounded-full bg-brand-amber/20 flex items-center justify-center text-brand-amber font-bold text-sm ring-2 ring-brand-amber/30">S</div>
-                        <div>
-                            <p class="text-sm font-semibold text-brand-black">Samsul</p>
-                            <p class="text-xs text-gray-400">Ketua RT 13</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="group relative p-6 md:p-8 bg-white rounded-2xl border border-gray-100 hover:border-brand-amber/30 hover:shadow-xl transition-all duration-300 cursor-pointer">
-                    <div class="absolute -top-3 -left-3 w-10 h-10 bg-brand-amber/10 rounded-full flex items-center justify-center">
-                        <svg class="w-5 h-5 text-brand-amber" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151C7.563 6.068 6 8.789 6 11h4v10H0z"/></svg>
-                    </div>
-                    <div class="flex items-center gap-1 text-brand-amber mb-4">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    </div>
-                    <p class="text-gray-600 text-sm leading-relaxed mb-6">"Saya bangga jadi bagian dari Karang Taruna 13. Banyak pengalaman berharga dan teman baru yang saya dapatkan di sini."</p>
-                    <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
-                        <div class="w-11 h-11 rounded-full bg-brand-amber/20 flex items-center justify-center text-brand-amber font-bold text-sm ring-2 ring-brand-amber/30">A</div>
-                        <div>
-                            <p class="text-sm font-semibold text-brand-black">Aulia</p>
-                            <p class="text-xs text-gray-400">Anggota</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="group relative p-6 md:p-8 bg-white rounded-2xl border border-gray-100 hover:border-brand-amber/30 hover:shadow-xl transition-all duration-300 cursor-pointer">
-                    <div class="absolute -top-3 -left-3 w-10 h-10 bg-brand-amber/10 rounded-full flex items-center justify-center">
-                        <svg class="w-5 h-5 text-brand-amber" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10H14.017zM0 21v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151C7.563 6.068 6 8.789 6 11h4v10H0z"/></svg>
-                    </div>
-                    <div class="flex items-center gap-1 text-brand-amber mb-4">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    </div>
-                    <p class="text-gray-600 text-sm leading-relaxed mb-6">"Program-program Karang Taruna 13 sangat bermanfaat bagi pemuda. Semoga semakin sukses dan membawa berkah bagi lingkungan."</p>
-                    <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
-                        <div class="w-11 h-11 rounded-full bg-brand-amber/20 flex items-center justify-center text-brand-amber font-bold text-sm ring-2 ring-brand-amber/30">D</div>
-                        <div>
-                            <p class="text-sm font-semibold text-brand-black">Dewi</p>
-                            <p class="text-xs text-gray-400">Warga RT 13</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+
 
     {{-- CTA Kontak --}}
     <section class="relative py-20 sm:py-24 bg-brand-amber overflow-hidden reveal-on-scroll">
