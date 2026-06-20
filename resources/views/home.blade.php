@@ -111,7 +111,7 @@
                 <div class="w-16 h-1 bg-brand-amber mx-auto mb-6 rounded-full"></div>
                 <p class="text-gray-600 leading-relaxed text-base md:text-lg mb-8 max-w-2xl mx-auto">
                     {{-- TODO: ganti dengan deskripsi asli organisasi --}}
-                    Karang Taruna 13 Rawa Buaya adalah organisasi kepemudaan yang beranggotakan remaja dan pemuda RT 13, Kelurahan Rawa Buaya, Kecamatan Cengkareng, Jakarta Barat. Berdiri dengan semangat kebersamaan dan kejernihan hati, kami berkomitmen untuk menjadi wadah pengembangan potensi pemuda serta berkontribusi positif bagi lingkungan sekitar.
+                    Karang Taruna 13 adalah organisasi kepemudaan yang beranggotakan remaja dan pemuda RT 13, Kelurahan Rawa Buaya, Kecamatan Cengkareng, Jakarta Barat. Berdiri dengan semangat kebersamaan dan kejernihan hati, kami berkomitmen untuk menjadi wadah pengembangan potensi pemuda serta berkontribusi positif bagi lingkungan sekitar.
                 </p>
                 <a href="{{ route('about') }}" class="group inline-flex items-center gap-2 px-6 py-3 bg-brand-amber text-brand-black font-semibold rounded-lg hover:bg-brand-amber/90 hover:shadow-lg hover:shadow-brand-amber/30 transition-all duration-200 cursor-pointer">
                     <span>Selengkapnya</span>
@@ -312,7 +312,12 @@
     </section>
 
     {{-- Preview Galeri --}}
-    <section class="py-20 sm:py-24 bg-gray-50 reveal-on-scroll">
+    <section class="py-20 sm:py-24 bg-gray-50 reveal-on-scroll"
+             x-data="{ selected: null, imgIndex: 0, galleries: @json($gallery) }"
+             x-init="$watch('selected', val => { if (val !== null) imgIndex = 0 })"
+             @keydown.escape.window="selected = null"
+             @keydown.arrow-left.window="if (selected !== null && imgIndex > 0) imgIndex--"
+             @keydown.arrow-right.window="if (selected !== null && imgIndex < selected.images.length - 1) imgIndex++">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-end justify-between mb-12">
                 <div>
@@ -324,26 +329,120 @@
                     <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                 </a>
             </div>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                @foreach($gallery as $item)
-                    <div class="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer aspect-square sm:aspect-[4/3]">
-                        <img src="{{ $item['image'] }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy">
-                        <div class="absolute inset-0 bg-gradient-to-t from-brand-black/80 via-brand-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end p-5">
-                            <div class="translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                                <p class="text-white text-sm font-medium">{{ $item['title'] }}</p>
-                                <span class="text-brand-amber text-xs">{{ $item['category'] }}</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                @foreach($gallery as $idx => $item)
+                    <div @click="selected = galleries[{{ $idx }}]; imgIndex = 0"
+                         class="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1">
+                        <div class="relative overflow-hidden aspect-[4/3]">
+                            <img src="{{ $item['image'] }}" alt="{{ $item['title'] }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-2 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                <span class="text-white text-xs">{{ $item['date'] }}</span>
                             </div>
+                        </div>
+                        <div class="p-4 md:p-5">
+                            <span class="inline-block px-2.5 md:px-3 py-1 bg-brand-amber/15 text-brand-amber text-xs font-semibold rounded-full mb-2 md:mb-3">
+                                {{ $item['category'] }}
+                            </span>
+                            <h3 class="font-semibold text-sm md:text-base text-brand-black mb-1.5 group-hover:text-brand-amber transition-colors duration-200">{{ $item['title'] }}</h3>
                         </div>
                     </div>
                 @endforeach
             </div>
-            <div class="text-center mt-10 sm:hidden">
-                <a href="{{ route('gallery.index') }}" class="group inline-flex items-center gap-2 px-6 py-3 bg-brand-amber text-brand-black font-semibold rounded-lg hover:bg-brand-amber/90 transition-all duration-200 cursor-pointer">
+            <div class="text-center mt-8 md:mt-10 sm:hidden">
+                <a href="{{ route('gallery.index') }}" class="group inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-amber text-brand-black font-semibold rounded-lg hover:bg-brand-amber/90 transition-all duration-200 cursor-pointer text-sm">
                     <span>Lihat Semua</span>
                     <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                 </a>
             </div>
         </div>
+
+        {{-- Lightbox Modal --}}
+        <template x-teleport="body">
+            <div x-show="selected !== null"
+                 x-cloak
+                 class="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div x-show="selected !== null"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="absolute inset-0 bg-black/90 backdrop-blur-sm"
+                     @click="selected = null"></div>
+                <div x-show="selected !== null"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 scale-95 translate-y-4"
+                     class="relative z-10 w-full max-w-4xl bg-white rounded-2xl overflow-hidden shadow-2xl">
+                    <div class="absolute top-0 left-0 right-0 z-30 h-1 bg-black/10">
+                        <div class="h-full bg-brand-amber transition-all duration-400"
+                             :style="`width: ${((imgIndex + 1) / (selected?.images?.length || 1)) * 100}%`"></div>
+                    </div>
+                    <button @click="selected = null"
+                            class="absolute top-4 right-4 z-30 w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm text-white flex items-center justify-center hover:bg-black/70 hover:scale-110 transition-all duration-200 cursor-pointer shadow-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                    <div class="relative bg-black">
+                        <template x-if="selected">
+                            <div>
+                                <template x-for="(img, i) in selected.images" :key="i">
+                                    <img :src="img" :alt="selected.title"
+                                         x-show="imgIndex === i"
+                                         x-transition:enter="transition ease-out duration-300"
+                                         x-transition:enter-start="opacity-0"
+                                         x-transition:enter-end="opacity-100"
+                                         x-transition:leave="transition ease-in duration-200"
+                                         x-transition:leave-start="opacity-100"
+                                         x-transition:leave-end="opacity-0"
+                                         class="w-full max-h-[65vh] object-contain" loading="lazy">
+                                </template>
+                            </div>
+                        </template>
+                        <div x-show="selected && selected.images.length > 1"
+                             class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 px-3 py-2 rounded-full bg-black/50 backdrop-blur-sm">
+                            <template x-for="(_, i) in selected?.images || []" :key="i">
+                                <button @click="imgIndex = i"
+                                        class="h-1.5 rounded-full transition-all duration-300 cursor-pointer"
+                                        :class="i === imgIndex ? 'w-6 bg-brand-amber' : 'w-1.5 bg-white/50 hover:bg-white/80'"></button>
+                            </template>
+                        </div>
+                        <div x-show="selected && selected.images.length > 1"
+                             class="absolute top-4 left-4 z-20 px-3 py-1 rounded-full bg-black/50 backdrop-blur-sm text-white text-xs font-medium"
+                             x-text="`${imgIndex + 1} / ${selected.images.length}`"></div>
+                        <button @click="if (imgIndex > 0) imgIndex--"
+                                x-show="imgIndex > 0"
+                                class="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/15 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/30 hover:scale-110 transition-all duration-200 cursor-pointer shadow-lg border border-white/10">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                        </button>
+                        <button @click="if (imgIndex < selected.images.length - 1) imgIndex++"
+                                x-show="imgIndex < selected.images.length - 1"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 rounded-full bg-white/15 backdrop-blur-md text-white flex items-center justify-center hover:bg-white/30 hover:scale-110 transition-all duration-200 cursor-pointer shadow-lg border border-white/10">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                    <template x-if="selected">
+                        <div class="p-5 sm:p-6">
+                            <div class="flex items-center justify-between mb-1">
+                                <h3 class="font-semibold text-lg text-brand-black" x-text="selected.title"></h3>
+                                <span class="inline-block px-3 py-1 bg-brand-amber/15 text-brand-amber text-xs font-semibold rounded-full" x-text="selected.category"></span>
+                            </div>
+                            <p class="text-sm text-gray-500" x-text="selected.description"></p>
+                            <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+                                <div class="flex items-center gap-2 text-xs text-gray-400">
+                                    <span class="flex items-center gap-1"><kbd class="px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 font-mono text-[10px]">ESC</kbd> Tutup</span>
+                                    <span class="flex items-center gap-1"><kbd class="px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 font-mono text-[10px]">←</kbd><kbd class="px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 font-mono text-[10px]">→</kbd> Navigasi</span>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </template>
     </section>
 
     {{-- Statistik Singkat dengan counter animasi --}}

@@ -28,7 +28,22 @@ class GalleryData
 
     public static function preview(int $limit = 8): array
     {
-        return array_slice(self::all(), 0, $limit);
+        $all = self::all();
+
+        $seen = [];
+        $result = [];
+        foreach ($all as $item) {
+            $key = $item['title'];
+            if (!isset($seen[$key])) {
+                $seen[$key] = true;
+                $result[] = $item;
+            }
+            if (count($result) >= $limit) {
+                break;
+            }
+        }
+
+        return $result;
     }
 
     public static function categories(): array
