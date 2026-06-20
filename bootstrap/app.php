@@ -17,6 +17,4 @@ $app = Application::configure(basePath: dirname(__DIR__))
         //
     })->create();
 
-$app->useStoragePath(realpath(__DIR__ . '/../storage'));
-
 return $app;
