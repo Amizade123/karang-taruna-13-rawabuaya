@@ -1,11 +1,32 @@
 <?php
 
-header('Content-Type: text/plain');
-echo "VERCEL: " . (getenv('VERCEL') ?: 'NOT SET') . "\n";
-echo "NOW_REGION: " . (getenv('NOW_REGION') ?: 'NOT SET') . "\n";
-echo "APP_KEY: " . (getenv('APP_KEY') ?: 'NOT SET') . "\n";
-echo "APP_ENV: " . (getenv('APP_ENV') ?: 'NOT SET') . "\n";
-echo "PHP version: " . phpversion() . "\n";
+if (getenv('VERCEL') || getenv('NOW_REGION')) {
+    putenv('APP_ENV=production');
+    putenv('APP_DEBUG=false');
+    putenv('LOG_CHANNEL=stderr');
+    putenv('SESSION_DRIVER=array');
+    putenv('CACHE_STORE=array');
 
-echo "\n--- All env vars ---\n";
-print_r(getenv());
+    $dirs = [
+        '/tmp/storage/framework/views',
+        '/tmp/storage/framework/cache',
+        '/tmp/storage/framework/cache/data',
+        '/tmp/storage/framework/sessions',
+        '/tmp/storage/logs',
+    ];
+    foreach ($dirs as $dir) {
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+    }
+
+    putenv('VIEW_COMPILED_PATH=/tmp/storage/framework/views');
+
+    // Force APP_KEY if not available from env
+    $key = getenv('APP_KEY');
+    if (!$key) {
+        putenv('APP_KEY=base64:6wUneeeyxhXw6nNgr5g4qOauPrJZYnZ0h31r9TlrO1I=');
+    }
+}
+
+require __DIR__ . '/../public/index.php';
